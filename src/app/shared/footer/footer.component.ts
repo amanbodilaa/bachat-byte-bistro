@@ -8,6 +8,8 @@ import { RouterLink } from '@angular/router';
   template: `
     <footer class="footer">
       <div class="footer-inner container">
+        
+        <!-- Brand Info -->
         <div class="footer-brand">
           <img src="logo.png" alt="Bachat Byte Bistro" class="footer-logo" />
           <div>
@@ -16,22 +18,19 @@ import { RouterLink } from '@angular/router';
             <p class="footer-tagline">"Savour. Save. Share."</p>
           </div>
         </div>
-        <div class="footer-links">
-          <h4>Order</h4>
-          <a routerLink="/menu">View Menu</a>
+
+        <!-- Navigation Links -->
+        <div class="footer-nav">
+          <a routerLink="/">Home</a>
+          <a routerLink="/menu">Menu</a>
+          <a href="/#stories">About Us</a>
+          <a routerLink="/track/demo">Track Order</a>
           <a routerLink="/checkout">Checkout</a>
         </div>
-        <div class="footer-links">
-          <h4>Staff</h4>
-          <a routerLink="/counter">Counter</a>
-          <a routerLink="/kitchen">Kitchen Display</a>
-        </div>
-        <div class="footer-links">
-          <h4>Info</h4>
-          <span>All prices ₹100 or below</span>
-          <span>Fresh &amp; made to order</span>
-        </div>
+
       </div>
+
+      <!-- Footer Bottom Copyright -->
       <div class="footer-bottom">
         <span>© 2026 Bachat Byte Bistro · Savour. Save. Share.</span>
       </div>
@@ -44,73 +43,93 @@ import { RouterLink } from '@angular/router';
       padding: 3rem 0 0;
     }
     .footer-inner {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       gap: 2rem;
-      padding-bottom: 2rem;
+      padding-bottom: 2.5rem;
+      flex-wrap: wrap;
     }
     .footer-brand {
       display: flex;
-      align-items: flex-start;
-      gap: 1rem;
+      align-items: center;
+      gap: 1.15rem;
     }
     .footer-logo {
-      width: 52px;
-      height: 52px;
+      width: 76px;
+      height: 76px;
       border-radius: 50%;
-      border: 2px solid var(--color-terracotta);
+      border: 3.5px solid var(--color-terracotta);
+      box-shadow:
+        0 0 0 5px rgba(217, 112, 31, 0.20),
+        0 8px 24px rgba(0,0,0,0.35);
       object-fit: cover;
       flex-shrink: 0;
+      transition: transform var(--transition-base), box-shadow var(--transition-base);
+    }
+    .footer-brand:hover .footer-logo {
+      transform: scale(1.06) rotate(3deg);
+      box-shadow:
+        0 0 0 7px rgba(217, 112, 31, 0.28),
+        0 12px 30px rgba(0,0,0,0.45);
     }
     .footer-name {
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: 1.1rem;
+      font-size: 1.35rem;
       color: var(--color-cream);
+      letter-spacing: -0.01em;
     }
     .footer-hindi {
-      font-size: 0.8rem;
+      font-size: 0.88rem;
       color: var(--color-terracotta);
       font-weight: 700;
+      letter-spacing: 0.02em;
     }
     .footer-tagline {
-      font-size: 0.85rem;
-      color: var(--color-muted-light);
-      opacity: 0.7;
-      margin-top: 0.25rem;
-    }
-    .footer-links {
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-    }
-    .footer-links h4 {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 0.95rem;
-      color: var(--color-amber-gold);
-      margin-bottom: 0.25rem;
-    }
-    .footer-links a, .footer-links span {
-      font-size: 0.875rem;
+      font-size: 0.88rem;
       color: var(--color-muted-light);
       opacity: 0.75;
+      margin-top: 0.15rem;
+    }
+
+    .footer-nav {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      flex-wrap: wrap;
+    }
+    .footer-nav a {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-muted-light);
+      opacity: 0.85;
       transition: opacity var(--transition-fast), color var(--transition-fast);
     }
-    .footer-links a:hover { opacity: 1; color: var(--color-cream); }
+    .footer-nav a:hover {
+      opacity: 1;
+      color: var(--color-amber-gold);
+    }
+
     .footer-bottom {
       border-top: 1px solid rgba(255,255,255,0.08);
-      padding: 1rem 1.5rem;
+      padding: 1.25rem 1.5rem;
       text-align: center;
       font-size: 0.8rem;
-      opacity: 0.5;
+      opacity: 0.55;
     }
+
     @media (max-width: 768px) {
-      .footer-inner { grid-template-columns: 1fr 1fr; }
-      .footer-brand { grid-column: 1 / -1; }
-    }
-    @media (max-width: 480px) {
-      .footer-inner { grid-template-columns: 1fr; }
+      .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+      }
+      .footer-nav {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.85rem;
+      }
     }
   `]
 })

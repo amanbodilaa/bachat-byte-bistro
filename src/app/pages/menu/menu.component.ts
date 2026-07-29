@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { MenuService } from '../../core/services/menu.service';
 import { CartService } from '../../core/services/cart.service';
 import { MenuItem } from '../../core/models/menu-item.model';
-import { CartItem } from '../../core/models/cart.model';
 
 @Component({
   selector: 'app-menu',
@@ -12,28 +11,115 @@ import { CartItem } from '../../core/models/cart.model';
   imports: [AsyncPipe],
   template: `
     <div class="page-wrapper">
-      <div class="menu-page">
-        <!-- Left: Menu Grid -->
-        <div class="menu-section">
-          <div class="menu-header">
-            <h1>Our Menu</h1>
-            <p class="menu-sub">All items ₹100 or below · Fresh &amp; made to order</p>
+      
+      <!-- Menu Hero Banner -->
+      <div class="menu-hero">
+        <div class="container menu-hero-inner">
+          <div class="hero-left">
+            <span class="menu-eyebrow">
+              <span class="devanagari">बचत</span> · Gourmet Food Fest
+            </span>
+            <h1>Bachat Bistro Craft Menu</h1>
+            <p class="menu-hero-sub">
+              Handcrafted street food &amp; refreshing blends · Every single dish <strong>₹100 or below</strong>
+            </p>
+          </div>
+          <div class="price-guarantee-badge">
+            <div class="badge-ring">
+              <span class="badge-price">₹100</span>
+              <span class="badge-text">MAX PRICE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Container -->
+      <div class="menu-page container">
+
+        <!-- Category Filters Bar -->
+        <div class="category-bar">
+          <div class="categories-scroll">
+            @for (cat of categories; track cat.id) {
+              <button 
+                class="category-btn" 
+                [class.active]="selectedCategory === cat.id"
+                (click)="selectedCategory = cat.id">
+                <span class="cat-icon">{{ cat.icon }}</span>
+                <span>{{ cat.name }}</span>
+                <span class="cat-count">{{ getCategoryCount(cat.id) }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Full-Width Menu Section -->
+        <div class="menu-full-section">
+          <div class="section-title-row">
+            <h2>{{ getCategoryTitle() }}</h2>
+            <span class="items-found">{{ filteredMenuItems.length }} item(s)</span>
           </div>
 
+          <!-- Full Width Grid for Food Cards -->
           <div class="menu-grid">
-            @for (item of menuItems; track item.id) {
-              <div class="menu-card" [class.added]="getCartQty(item.id) > 0">
-                <div class="card-emoji">{{ item.emoji }}</div>
-                <div class="card-body">
-                  <div class="card-header-row">
-                    <h3 class="card-name">{{ item.name }}</h3>
-                    <span class="badge badge-cuisine">{{ item.cuisine }}</span>
+            @for (item of filteredMenuItems; track item.id) {
+              <div class="menu-card" [class.in-cart]="getCartQty(item.id) > 0">
+
+                <!-- Image & Badges -->
+                <div class="card-img-wrap" (click)="openQuickView(item)">
+                  @if (item.image) {
+                    <img [src]="item.image" [alt]="item.name" class="card-img" loading="lazy" />
+                  } @else {
+                    <div class="card-emoji-fallback">{{ item.emoji }}</div>
+                  }
+                  
+                  <div class="card-img-overlay"></div>
+
+                  <!-- Badges Top -->
+                  <div class="card-badges-top">
+                    @if (item.tag) {
+                      <span class="item-tag">{{ item.tag }}</span>
+                    }
+                    <span class="flag-badge">{{ item.flag || '🇮🇳' }}</span>
                   </div>
+
+                  @if (item.prepTime) {
+                    <div class="prep-time-badge">
+                      ⏱️ {{ item.prepTime }}
+                    </div>
+                  }
+
+                  <button class="quick-view-btn" aria-label="View dish story">
+                    ℹ️ Story
+                  </button>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+                  <div class="card-meta">
+                    <span class="cuisine-tag">{{ item.cuisine }}</span>
+                  </div>
+
+                  <h3 class="card-name" (click)="openQuickView(item)">{{ item.name }}</h3>
                   <p class="card-desc">{{ item.description }}</p>
+
+                  @if (item.funFact) {
+                    <div class="card-teaser" (click)="openQuickView(item)">
+                      <span class="teaser-icon">💡</span>
+                      <span class="teaser-text">{{ item.funFact }}</span>
+                    </div>
+                  }
+
+                  <!-- Card Footer / Actions -->
                   <div class="card-footer">
-                    <span class="price-tag">₹{{ item.price }}</span>
+                    <div class="price-wrap">
+                      <span class="currency">₹</span>
+                      <span class="price-val">{{ item.price }}</span>
+                    </div>
+
                     @if (getCartQty(item.id) === 0) {
-                      <button class="btn btn-primary btn-sm" (click)="addToCart(item)">+ Add</button>
+                      <button class="btn btn-primary btn-add" (click)="addToCart(item)">
+                        <span>+ Add to Cart</span>
+                      </button>
                     } @else {
                       <div class="qty-stepper">
                         <button class="qty-btn" (click)="decrease(item)" aria-label="Decrease quantity">−</button>
@@ -42,274 +128,569 @@ import { CartItem } from '../../core/models/cart.model';
                       </div>
                     }
                   </div>
+
                 </div>
               </div>
             }
           </div>
         </div>
 
-        <!-- Right: Cart Sidebar -->
-        <aside class="cart-sidebar">
-          <div class="cart-box">
-            <div class="cart-header">
-              <h2>🛒 Your Cart</h2>
-              @if ((cart$ | async)!.length > 0) {
-                <button class="clear-btn" (click)="clearCart()">Clear all</button>
+      </div>
+
+      <!-- Floating Basket Trigger Button (Active when items > 0) -->
+      @if ((cartCount$ | async)! > 0) {
+        <div class="floating-basket-bar" (click)="openCart()">
+          <div class="fb-left">
+            <span class="fb-icon">🛒</span>
+            <div class="fb-text">
+              <span class="fb-count">{{ cartCount$ | async }} item(s) in basket</span>
+              <span class="fb-sub">Tap to view &amp; checkout</span>
+            </div>
+          </div>
+          <div class="fb-right">
+            <span class="fb-total">₹{{ cartTotal$ | async }}</span>
+            <span class="fb-arrow">View Basket →</span>
+          </div>
+        </div>
+      }
+
+      <!-- Dish Quick View Modal -->
+      @if (selectedModalItem) {
+        <div class="modal-overlay" (click)="closeModal()">
+          <div class="modal-card" (click)="$event.stopPropagation()">
+            <button class="modal-close-btn" (click)="closeModal()">✕</button>
+            
+            <div class="modal-img-wrap">
+              @if (selectedModalItem.image) {
+                <img [src]="selectedModalItem.image" [alt]="selectedModalItem.name" class="modal-img" />
               }
+              <div class="modal-flag">{{ selectedModalItem.flag || '🇮🇳' }}</div>
             </div>
 
-            @if ((cart$ | async)!.length === 0) {
-              <div class="empty-cart">
-                <div class="empty-icon">🍽️</div>
-                <p>Your cart is empty.<br>Add something delicious!</p>
-              </div>
-            } @else {
-              <div class="cart-items">
-                @for (item of cart$ | async; track item.menuItem.id) {
-                  <div class="cart-item">
-                    <span class="cart-item-emoji">{{ item.menuItem.emoji }}</span>
-                    <div class="cart-item-info">
-                      <div class="cart-item-name">{{ item.menuItem.name }}</div>
-                      <div class="cart-item-price">₹{{ item.menuItem.price }} × {{ item.quantity }}</div>
-                    </div>
-                    <div class="cart-item-actions">
-                      <div class="qty-stepper">
-                        <button class="qty-btn" (click)="decreaseCart(item)" aria-label="Decrease">−</button>
-                        <span class="qty-value">{{ item.quantity }}</span>
-                        <button class="qty-btn" (click)="increaseCart(item)" aria-label="Increase">+</button>
-                      </div>
-                      <div class="cart-item-subtotal">₹{{ item.menuItem.price * item.quantity }}</div>
-                    </div>
-                  </div>
+            <div class="modal-body">
+              <div class="modal-meta">
+                <span class="cuisine-tag">{{ selectedModalItem.cuisine }}</span>
+                @if (selectedModalItem.prepTime) {
+                  <span class="modal-prep">⏱️ {{ selectedModalItem.prepTime }}</span>
                 }
               </div>
 
-              <div class="cart-summary">
-                <div class="summary-row">
-                  <span>Subtotal</span>
-                  <span>₹{{ cartTotal$ | async }}</span>
+              <h2 class="modal-title">{{ selectedModalItem.name }}</h2>
+              <p class="modal-desc">{{ selectedModalItem.description }}</p>
+
+              @if (selectedModalItem.funFact) {
+                <div class="modal-story-box">
+                  <div class="story-box-title">💡 Dish Highlight</div>
+                  <p class="story-box-text">{{ selectedModalItem.funFact }}</p>
                 </div>
-                <div class="summary-row note">
-                  <span>Pay at counter (Cash/UPI)</span>
-                </div>
-                <div class="summary-total">
-                  <span>Total</span>
-                  <span class="price-tag">₹{{ cartTotal$ | async }}</span>
-                </div>
-                <button class="btn btn-primary" style="width:100%;margin-top:1rem;" (click)="checkout()">
-                  Proceed to Checkout →
+              }
+
+              <div class="modal-footer">
+                <div class="modal-price">₹{{ selectedModalItem.price }}</div>
+                <button class="btn btn-primary" (click)="addToCart(selectedModalItem); closeModal()">
+                  + Add to Basket
                 </button>
               </div>
-            }
+            </div>
           </div>
-        </aside>
-      </div>
-
-      <!-- Mobile Sticky Cart Bar -->
-      @if ((cartCount$ | async)! > 0) {
-        <div class="mobile-cart-bar">
-          <div class="mobile-cart-info">
-            <span class="mobile-cart-count">{{ cartCount$ | async }} item(s)</span>
-            <span class="mobile-cart-total">₹{{ cartTotal$ | async }}</span>
-          </div>
-          <button class="btn btn-primary btn-sm" (click)="checkout()">Checkout →</button>
         </div>
       }
+
     </div>
   `,
   styles: [`
-    .menu-page {
-      display: grid;
-      grid-template-columns: 1fr 360px;
-      gap: 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem 4rem;
-      align-items: start;
+    .page-wrapper {
+      background: var(--color-offwhite);
+      min-height: 100vh;
     }
-    .menu-header { margin-bottom: 2rem; }
-    .menu-header h1 { margin-bottom: 0.35rem; }
-    .menu-sub { opacity: 0.65; font-size: 0.95rem; }
 
-    /* Menu Grid */
-    .menu-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.25rem;
-    }
-    .menu-card {
-      background: var(--color-white);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
+    /* Menu Hero Banner */
+    .menu-hero {
+      background: linear-gradient(135deg, #0d4a50 0%, #0F5C62 45%, #1E413D 100%);
+      color: white;
+      padding: 6.5rem 0 3.5rem;
+      position: relative;
       overflow: hidden;
-      transition: transform var(--transition-base), box-shadow var(--transition-base);
-      border: 2px solid transparent;
     }
-    .menu-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-md);
+    .menu-hero-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
     }
-    .menu-card.added {
-      border-color: var(--color-terracotta);
+    .menu-eyebrow {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-amber-gold);
+      margin-bottom: 0.75rem;
     }
-    .card-emoji {
-      font-size: 3.5rem;
-      background: linear-gradient(135deg, var(--color-cream), var(--color-offwhite));
+    .menu-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      font-weight: 800;
+      color: white;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+    .menu-hero-sub {
+      font-size: 1.05rem;
+      color: rgba(228,217,195,0.8);
+      max-width: 540px;
+    }
+    .price-guarantee-badge {
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100px;
     }
-    .card-body { padding: 1.25rem; }
-    .card-header-row {
+    .badge-ring {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: rgba(217,112,31,0.15);
+      border: 3px dashed var(--color-amber-gold);
       display: flex;
-      align-items: flex-start;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+      animation: pulse-ring 3s infinite;
+    }
+    .badge-price {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--color-amber-gold);
+      line-height: 1;
+    }
+    .badge-text {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.8);
+      margin-top: 0.2rem;
+    }
+
+    /* Category Navigation Bar */
+    .category-bar {
+      margin: 1.25rem 0 2rem;
+      position: sticky;
+      top: var(--navbar-height);
+      z-index: 50;
+      background: rgba(251, 248, 231, 0.95);
+      backdrop-filter: blur(12px);
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(15, 92, 98, 0.08);
+    }
+    .categories-scroll {
+      display: flex;
+      gap: 0.75rem;
+      overflow-x: auto;
+      padding: 0.25rem 0.25rem 0.5rem;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .categories-scroll::-webkit-scrollbar { display: none; }
+
+    .category-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.75rem 1.4rem;
+      border-radius: var(--radius-full);
+      background: white;
+      border: 2px solid rgba(15, 92, 98, 0.12);
+      color: var(--color-teal-dark);
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+      transition: all var(--transition-base);
+    }
+    .category-btn:hover {
+      border-color: var(--color-terracotta);
+      transform: translateY(-2px);
+    }
+    .category-btn.active {
+      background: var(--color-terracotta);
+      color: white;
+      border-color: var(--color-terracotta);
+      box-shadow: 0 8px 24px rgba(217, 112, 31, 0.35);
+    }
+    .cat-icon { font-size: 1.1rem; }
+    .cat-count {
+      background: rgba(0,0,0,0.08);
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .category-btn.active .cat-count {
+      background: rgba(255,255,255,0.25);
+      color: white;
+    }
+
+    /* Menu Full Section */
+    .menu-full-section {
+      padding-bottom: 6rem;
+    }
+    .section-title-row {
+      display: flex;
+      align-items: center;
       justify-content: space-between;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1.75rem;
+    }
+    .section-title-row h2 {
+      font-size: 1.75rem;
+      color: var(--color-teal-deep);
+    }
+    .items-found {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: rgba(15, 92, 98, 0.6);
+    }
+
+    /* Dish Cards Grid — Full Width 3-4 Columns */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .menu-card {
+      background: white;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(15, 92, 98, 0.08);
+      border: 2px solid transparent;
+      display: flex;
+      flex-direction: column;
+      transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+    }
+    .menu-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 48px rgba(217, 112, 31, 0.18);
+      border-color: rgba(217, 112, 31, 0.3);
+    }
+    .menu-card.in-cart {
+      border-color: var(--color-terracotta);
+    }
+
+    /* Card Image */
+    .card-img-wrap {
+      position: relative;
+      height: 220px;
+      overflow: hidden;
+      cursor: pointer;
+      background: #f0ebe0;
+    }
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    .menu-card:hover .card-img {
+      transform: scale(1.08);
+    }
+    .card-img-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 40%, rgba(0,0,0,0.4) 100%);
+    }
+
+    .card-badges-top {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      right: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 2;
+    }
+    .item-tag {
+      background: rgba(217, 112, 31, 0.92);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--radius-full);
+      backdrop-filter: blur(4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .flag-badge {
+      background: rgba(255,255,255,0.92);
+      font-size: 1.15rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .prep-time-badge {
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      background: rgba(15, 92, 98, 0.88);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.3rem 0.75rem;
+      border-radius: var(--radius-full);
+      backdrop-filter: blur(4px);
+      z-index: 2;
+    }
+
+    .quick-view-btn {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
+      background: rgba(255,255,255,0.92);
+      border: none;
+      color: var(--color-teal-deep);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      z-index: 2;
+      transition: background 0.2s;
+    }
+    .quick-view-btn:hover { background: white; }
+
+    /* Card Body */
+    .card-body {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .card-meta { margin-bottom: 0.35rem; }
+    .cuisine-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-terracotta);
     }
     .card-name {
       font-family: var(--font-display);
-      font-size: 1.05rem;
-      font-weight: 700;
+      font-size: 1.35rem;
+      font-weight: 800;
       color: var(--color-teal-deep);
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      line-height: 1.2;
     }
     .card-desc {
-      font-size: 0.82rem;
-      opacity: 0.7;
-      margin-bottom: 1rem;
-      line-height: 1.5;
+      font-size: 0.875rem;
+      color: rgba(30, 65, 61, 0.75);
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+      flex: 1;
     }
+
+    .card-teaser {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      background: var(--color-offwhite);
+      padding: 0.6rem 0.85rem;
+      border-radius: var(--radius-md);
+      font-size: 0.8rem;
+      color: var(--color-teal-dark);
+      margin-bottom: 1.25rem;
+      cursor: pointer;
+      border: 1px solid rgba(217, 112, 31, 0.14);
+    }
+    .teaser-icon { flex-shrink: 0; }
+    .teaser-text { opacity: 0.85; line-height: 1.4; }
+
+    /* Card Footer */
     .card-footer {
       display: flex;
       align-items: center;
       justify-content: space-between;
-    }
-
-    /* Cart Sidebar */
-    .cart-sidebar {
-      position: sticky;
-      top: calc(var(--navbar-height) + 1.5rem);
-    }
-    .cart-box {
-      background: var(--color-white);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-md);
-      overflow: hidden;
-    }
-    .cart-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.25rem 1.5rem;
-      border-bottom: 2px solid var(--color-cream);
-    }
-    .cart-header h2 { font-size: 1.1rem; }
-    .clear-btn {
-      background: none;
-      border: none;
-      color: var(--color-terracotta);
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 0.2rem 0.5rem;
-      border-radius: var(--radius-full);
-      transition: background var(--transition-fast);
-    }
-    .clear-btn:hover { background: rgba(217,112,31,0.1); }
-    .empty-cart {
-      padding: 3rem 2rem;
-      text-align: center;
-    }
-    .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
-    .empty-cart p { opacity: 0.6; font-size: 0.9rem; }
-    .cart-items {
-      padding: 1rem;
-      max-height: 380px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    .cart-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem;
-      background: var(--color-offwhite);
-      border-radius: var(--radius-md);
-    }
-    .cart-item-emoji { font-size: 1.5rem; flex-shrink: 0; }
-    .cart-item-info { flex: 1; }
-    .cart-item-name { font-weight: 600; font-size: 0.875rem; color: var(--color-teal-deep); }
-    .cart-item-price { font-size: 0.78rem; opacity: 0.6; margin-top: 0.1rem; }
-    .cart-item-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; }
-    .cart-item-subtotal { font-weight: 700; font-size: 0.9rem; color: var(--color-terracotta); }
-    .cart-summary {
-      padding: 1rem 1.5rem 1.5rem;
-      border-top: 2px solid var(--color-cream);
-    }
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.875rem;
-      padding: 0.3rem 0;
-      opacity: 0.7;
-    }
-    .summary-row.note { opacity: 0.5; font-size: 0.78rem; font-style: italic; }
-    .summary-total {
-      display: flex;
-      justify-content: space-between;
-      font-weight: 700;
-      font-size: 1rem;
-      padding: 0.75rem 0 0;
+      padding-top: 1rem;
       border-top: 1px solid var(--color-cream);
-      margin-top: 0.35rem;
+    }
+    .price-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 0.1rem;
+      color: var(--color-terracotta);
+    }
+    .currency { font-weight: 700; font-size: 1.15rem; }
+    .price-val { font-family: var(--font-display); font-weight: 900; font-size: 1.7rem; }
+
+    .btn-add {
+      padding: 0.65rem 1.4rem;
+      font-size: 0.95rem;
     }
 
-    /* Mobile sticky cart bar */
-    .mobile-cart-bar {
-      display: none;
+    /* Floating Basket Bar */
+    .floating-basket-bar {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--color-teal-deep);
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 900;
+      background: linear-gradient(135deg, var(--color-teal-deep), var(--color-teal-dark));
       color: white;
-      padding: 1rem 1.5rem;
+      padding: 0.85rem 1.5rem;
+      border-radius: var(--radius-full);
+      display: flex;
       align-items: center;
       justify-content: space-between;
-      z-index: 800;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+      gap: 2rem;
+      box-shadow: 0 12px 40px rgba(15, 92, 98, 0.35);
+      border: 2px solid var(--color-amber-gold);
+      cursor: pointer;
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
     }
-    .mobile-cart-info { display: flex; flex-direction: column; gap: 0.1rem; }
-    .mobile-cart-count { font-size: 0.85rem; opacity: 0.8; }
-    .mobile-cart-total { font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; color: var(--color-amber-gold); }
+    .floating-basket-bar:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 16px 50px rgba(217, 112, 31, 0.45);
+    }
+    .fb-left { display: flex; align-items: center; gap: 0.85rem; }
+    .fb-icon { font-size: 1.5rem; }
+    .fb-text { display: flex; flex-direction: column; }
+    .fb-count { font-weight: 800; font-size: 0.95rem; color: white; }
+    .fb-sub { font-size: 0.72rem; color: var(--color-amber-gold); }
+    .fb-right { display: flex; align-items: center; gap: 1rem; }
+    .fb-total { font-family: var(--font-display); font-weight: 900; font-size: 1.4rem; color: var(--color-amber-gold); }
+    .fb-arrow {
+      background: var(--color-terracotta);
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+    }
 
-    @media (max-width: 900px) {
-      .menu-page { grid-template-columns: 1fr; }
-      .cart-sidebar { display: none; }
-      .mobile-cart-bar { display: flex; }
-      .page-wrapper { padding-bottom: 80px; }
+    /* Modal Quick View */
+    .modal-card {
+      background: white;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      max-width: 520px;
+      width: 92%;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      animation: slideUp 0.3s ease;
     }
-    @media (max-width: 480px) {
+    .modal-close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .modal-img-wrap {
+      height: 240px;
+      position: relative;
+      background: #f0ebe0;
+    }
+    .modal-img { width: 100%; height: 100%; object-fit: cover; }
+    .modal-flag {
+      position: absolute;
+      bottom: 1rem;
+      left: 1.5rem;
+      background: white;
+      font-size: 1.3rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .modal-body { padding: 1.75rem 1.75rem 1.5rem; }
+    .modal-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+    .modal-prep { font-size: 0.78rem; font-weight: 600; color: var(--color-teal-deep); }
+    .modal-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; color: var(--color-teal-deep); margin-bottom: 0.5rem; }
+    .modal-desc { font-size: 0.9rem; color: rgba(30,65,61,0.8); line-height: 1.6; margin-bottom: 1.25rem; }
+    .modal-story-box {
+      background: var(--color-offwhite);
+      border-left: 4px solid var(--color-terracotta);
+      padding: 0.85rem 1rem;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+    }
+    .story-box-title { font-size: 0.75rem; font-weight: 700; color: var(--color-terracotta); text-transform: uppercase; margin-bottom: 0.25rem; }
+    .story-box-text { font-size: 0.85rem; color: var(--color-teal-dark); line-height: 1.5; }
+    .modal-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--color-cream); padding-top: 1rem; }
+    .modal-price { font-family: var(--font-display); font-size: 1.8rem; font-weight: 900; color: var(--color-terracotta); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .menu-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; }
+      .floating-basket-bar { right: 1rem; left: 1rem; bottom: 1.5rem; gap: 1rem; }
+      .fb-sub { display: none; }
+    }
+    @media (max-width: 600px) {
+      .menu-hero { padding: 5.5rem 0 2.5rem; }
       .menu-grid { grid-template-columns: 1fr; }
+      .card-img-wrap { height: 190px; }
+      .price-guarantee-badge { display: none; }
     }
   `]
 })
 export class MenuComponent implements OnInit {
   menuItems: MenuItem[] = [];
+  selectedCategory = 'all';
+  selectedModalItem: MenuItem | null = null;
+
   private cartService = inject(CartService);
   private menuService = inject(MenuService);
   private router = inject(Router);
+
   cart$ = this.cartService.cart$;
   cartTotal$ = this.cartService.cartTotal$;
   cartCount$ = this.cartService.cartCount$;
 
-  constructor() {}
+  categories = [
+    { id: 'all', name: 'All Items', icon: '🍽️' },
+    { id: 'Mains', name: 'Mains & Tacos', icon: '🌮' },
+    { id: 'Street Food', name: 'Street Chaat', icon: '🥘' },
+    { id: 'Drinks & Desserts', name: 'Drinks & Desserts', icon: '🧊' },
+  ];
 
   ngOnInit(): void {
     this.menuService.getMenuItems().subscribe(items => (this.menuItems = items));
+  }
+
+  get filteredMenuItems(): MenuItem[] {
+    if (this.selectedCategory === 'all') {
+      return this.menuItems;
+    }
+    return this.menuItems.filter(item => item.category === this.selectedCategory);
+  }
+
+  getCategoryCount(catId: string): number {
+    if (catId === 'all') return this.menuItems.length;
+    return this.menuItems.filter(i => i.category === catId).length;
+  }
+
+  getCategoryTitle(): string {
+    const cat = this.categories.find(c => c.id === this.selectedCategory);
+    return cat ? `${cat.icon} ${cat.name}` : 'Menu';
   }
 
   getCartQty(itemId: string): number {
@@ -325,16 +706,16 @@ export class MenuComponent implements OnInit {
     this.cartService.removeItem(item.id);
   }
 
-  increaseCart(cartItem: CartItem): void {
-    this.cartService.addItem(cartItem.menuItem);
+  openQuickView(item: MenuItem): void {
+    this.selectedModalItem = item;
   }
 
-  decreaseCart(cartItem: CartItem): void {
-    this.cartService.removeItem(cartItem.menuItem.id);
+  closeModal(): void {
+    this.selectedModalItem = null;
   }
 
-  clearCart(): void {
-    this.cartService.clearCart();
+  openCart(): void {
+    this.cartService.openCart();
   }
 
   checkout(): void {

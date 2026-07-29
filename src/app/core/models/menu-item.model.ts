@@ -6,4 +6,10 @@ export interface MenuItem {
   emoji: string;
   description: string;
   available: boolean;
+  image?: string;
+  flag?: string;
+  tag?: string;
+  category?: string;
+  prepTime?: string;
+  funFact?: string;
 }

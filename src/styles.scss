@@ -33,7 +33,7 @@
   --transition-base: 250ms ease;
   --transition-slow: 400ms ease;
 
-  --navbar-height: 88px;
+  --navbar-height: 96px;
 }
 
 /* ---- Reset ---- */
@@ -308,6 +308,13 @@ a {
 }
 .step-item.active .step-label { opacity: 1; color: var(--color-terracotta); }
 .step-item.done .step-label { opacity: 0.85; }
+
+@media (max-width: 640px) {
+  .step-item { min-width: 55px; }
+  .step-dot { width: 26px; height: 26px; font-size: 0.65rem; }
+  .step-label { font-size: 0.62rem; }
+  .step-item:not(:last-child)::after { top: 13px; }
+}
 
 /* ---- Quantity Stepper ---- */
 .qty-stepper {

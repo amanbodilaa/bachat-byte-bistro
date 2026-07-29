@@ -311,8 +311,8 @@ import { RouterLink } from '@angular/router';
     .t-contents { font-size: 0.85rem; color: rgba(255,255,255,0.55); }
 
     /* Tabs */
-    .tabs-bar { background: white; border-bottom: 1px solid #e8e0d0; position: sticky; top: 88px; z-index: 10; }
-    .tabs-inner { display: flex; gap: 0; }
+    .tabs-bar { background: white; border-bottom: 1px solid #e8e0d0; position: sticky; top: var(--navbar-height); z-index: 10; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .tabs-inner { display: flex; gap: 0; min-width: max-content; }
     .tab-btn {
       display: flex; align-items: center; gap: 0.5rem; padding: 1rem 1.75rem;
       border: none; background: none; cursor: pointer; font-family: var(--font-body);

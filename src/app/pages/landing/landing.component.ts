@@ -148,86 +148,60 @@ import { RouterLink } from '@angular/router';
 
       <div class="hiw-inner container">
         <div class="hiw-header">
-          <span class="hiw-eyebrow">Simple &amp; Fast</span>
+          <span class="hiw-eyebrow">
+            <span class="devanagari">सरल और तेज़</span> · 4-Step Process
+          </span>
           <h2 class="hiw-title">How It Works</h2>
-          <p class="hiw-sub">Four steps from craving to collection — no app download, no fuss</p>
+          <p class="hiw-sub">Four steps from craving to collection — no app download, zero waiting line</p>
         </div>
 
-        <!-- Timeline -->
-        <div class="hiw-timeline">
-          <!-- Connecting line behind cards -->
-          <div class="hiw-line">
-            <div class="hiw-line-fill"></div>
-          </div>
-
-          @for (step of steps; track step.no; let last = $last) {
-            <div class="hiw-step">
-              <!-- Watermark number -->
-              <div class="hiw-watermark">{{ step.no }}</div>
-
-              <!-- Icon bubble -->
-              <div class="hiw-icon-wrap" [class]="'step-color-' + step.no">
-                <div class="hiw-icon-ring">
-                  <span class="hiw-icon-svg">
-                    @if (step.no === 1) {
-                      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="10" y="4" width="24" height="36" rx="4" stroke="#D9701F" stroke-width="2"/>
-                        <rect x="14" y="8" width="16" height="10" rx="2" fill="rgba(217,112,31,0.2)" stroke="#D9701F" stroke-width="1.5"/>
-                        <circle cx="22" cy="32" r="3" fill="#D9701F"/>
-                        <line x1="14" y1="22" x2="30" y2="22" stroke="#E8AE4B" stroke-width="1.5" stroke-linecap="round"/>
-                        <line x1="14" y1="26" x2="26" y2="26" stroke="#E8AE4B" stroke-width="1.5" stroke-linecap="round"/>
-                      </svg>
-                    } @else if (step.no === 2) {
-                      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="6" y="12" width="32" height="22" rx="4" stroke="#E8AE4B" stroke-width="2"/>
-                        <rect x="6" y="17" width="32" height="5" fill="rgba(232,174,75,0.25)" stroke="none"/>
-                        <circle cx="14" cy="28" r="3" fill="rgba(232,174,75,0.4)" stroke="#E8AE4B" stroke-width="1.5"/>
-                        <rect x="22" y="26" width="10" height="4" rx="2" fill="rgba(232,174,75,0.4)" stroke="#E8AE4B" stroke-width="1.5"/>
-                        <text x="22" y="10" text-anchor="middle" font-size="10" font-weight="700" fill="#E8AE4B" font-family="sans-serif">₹</text>
-                      </svg>
-                    } @else if (step.no === 3) {
-                      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="8" y="8" width="28" height="20" rx="3" stroke="#E8AE4B" stroke-width="2" fill="rgba(232,174,75,0.15)"/>
-                        <text x="22" y="22" text-anchor="middle" font-size="11" font-weight="900" fill="#E8AE4B" font-family="sans-serif">#07</text>
-                        <path d="M14 32 Q22 38 30 32" stroke="#E8AE4B" stroke-width="2" stroke-linecap="round" fill="none"/>
-                        <circle cx="22" cy="38" r="3" fill="#E8AE4B"/>
-                      </svg>
-                    } @else if (step.no === 4) {
-                      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10 30 Q10 36 22 38 Q34 36 34 30" stroke="#DF953E" stroke-width="2" fill="rgba(223,149,62,0.15)" stroke-linejoin="round"/>
-                        <path d="M10 30 L10 20 Q10 16 22 14 Q34 16 34 20 L34 30" stroke="#DF953E" stroke-width="2" fill="rgba(223,149,62,0.15)"/>
-                        <polyline points="16,24 20,28 28,20" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    }
-                  </span>
+        <!-- 4-Card Step Grid -->
+        <div class="hiw-cards-grid">
+          @for (step of steps; track step.no) {
+            <div class="hiw-card">
+              <!-- Top Row: Giant Number + Icon -->
+              <div class="card-top-row">
+                <span class="step-num-big">0{{ step.no }}</span>
+                <div class="step-icon-box" [class]="'box-color-' + step.no">
+                  @if (step.no === 1) {
+                    <span class="step-emoji">📱</span>
+                  } @else if (step.no === 2) {
+                    <span class="step-emoji">💳</span>
+                  } @else if (step.no === 3) {
+                    <span class="step-emoji">🔔</span>
+                  } @else if (step.no === 4) {
+                    <span class="step-emoji">🍽️</span>
+                  }
                 </div>
-                <!-- Step number badge -->
-                <div class="hiw-badge">{{ step.no }}</div>
               </div>
 
-              <!-- Text -->
-              <div class="hiw-text">
-                <div class="hiw-step-label">Step {{ step.no }}</div>
-                <h3 class="hiw-step-title">{{ step.title }}</h3>
-                <p class="hiw-step-desc">{{ step.desc }}</p>
+              <!-- Card Content -->
+              <div class="card-content">
+                <span class="step-label-tag">STEP {{ step.no }}</span>
+                <h3 class="step-title">{{ step.title }}</h3>
+                <p class="step-desc">{{ step.desc }}</p>
               </div>
 
-              <!-- Arrow connector (not on last) -->
-              @if (!last) {
-                <div class="hiw-arrow">
-                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8 16 H24 M18 10 L24 16 L18 22" stroke="#E8AE4B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </div>
-              }
+              <!-- Bottom Feature Chip -->
+              <div class="card-chip">
+                @if (step.no === 1) {
+                  <span>📱 Instant Mobile Web</span>
+                } @else if (step.no === 2) {
+                  <span>📲 Cash or UPI at Counter</span>
+                } @else if (step.no === 3) {
+                  <span>🔔 Live SMS &amp; Token Screen</span>
+                } @else if (step.no === 4) {
+                  <span>⚡ Zero Waiting Line</span>
+                }
+              </div>
             </div>
           }
         </div>
 
         <!-- Bottom CTA -->
         <div class="hiw-cta">
-          <a routerLink="/menu" class="btn btn-primary btn-lg">Start Ordering Now →</a>
-          <p class="hiw-cta-note">Takes less than 2 minutes · No signup needed</p>
+          <a routerLink="/menu" class="btn btn-primary btn-lg">Explore Menu &amp; Order Now →</a>
+          <p class="hiw-cta-note">Takes under 60 seconds · No app download required</p>
         </div>
       </div>
 
@@ -486,214 +460,146 @@ import { RouterLink } from '@angular/router';
     .hiw-wave-top svg { height: 60px; }
     .hiw-wave-bottom svg { height: 60px; }
 
-    .hiw-inner { padding: 3.5rem 1.5rem; }
+    /* ===== HOW IT WORKS — Editorial Craft Cards ===== */
+    .how-it-works {
+      background: var(--color-offwhite);
+      position: relative;
+      padding: 2rem 0 5rem;
+    }
+    .hiw-inner { padding: 3rem 1.5rem; }
 
     .hiw-header {
       text-align: center;
-      margin-bottom: 4rem;
+      margin-bottom: 3.5rem;
     }
     .hiw-eyebrow {
       display: inline-block;
       text-transform: uppercase;
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       font-weight: 700;
-      letter-spacing: 0.16em;
-      color: var(--color-amber-gold);
-      background: rgba(232,174,75,0.15);
-      border: 1px solid rgba(232,174,75,0.3);
+      letter-spacing: 0.14em;
+      color: var(--color-terracotta);
+      background: rgba(217,112,31,0.12);
+      border: 1px solid rgba(217,112,31,0.25);
       border-radius: var(--radius-full);
-      padding: 0.3rem 1rem;
+      padding: 0.35rem 1.1rem;
       margin-bottom: 1rem;
     }
     .hiw-title {
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: clamp(1.8rem, 4vw, 2.75rem);
-      color: white;
-      margin-bottom: 0.75rem;
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      color: var(--color-teal-deep);
+      margin-bottom: 0.5rem;
     }
     .hiw-sub {
-      font-size: 1rem;
-      color: rgba(228,217,195,0.7);
-      max-width: 480px;
+      font-size: 1.05rem;
+      color: rgba(30,65,61,0.75);
+      max-width: 520px;
       margin: 0 auto;
     }
 
-    /* Timeline row */
-    .hiw-timeline {
+    /* 4-Card Step Grid */
+    .hiw-cards-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 0;
-      position: relative;
-      align-items: start;
-    }
-    /* Horizontal line */
-    .hiw-line {
-      position: absolute;
-      top: 56px;
-      left: 12.5%;
-      right: 12.5%;
-      height: 2px;
-      background: rgba(255,255,255,0.08);
-      z-index: 0;
-      border-radius: 1px;
-    }
-    .hiw-line-fill {
-      height: 100%;
-      width: 100%;
-      background: linear-gradient(90deg, var(--color-terracotta), var(--color-amber-gold), var(--color-terracotta));
-      border-radius: 1px;
-      animation: line-shimmer 3s ease-in-out infinite;
-    }
-    @keyframes line-shimmer {
-      0%   { opacity: 0.4; }
-      50%  { opacity: 1; }
-      100% { opacity: 0.4; }
+      gap: 1.75rem;
+      align-items: stretch;
     }
 
-    /* Each step */
-    .hiw-step {
-      position: relative;
+    .hiw-card {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: 2rem 1.5rem;
+      box-shadow: 0 10px 30px rgba(15, 92, 98, 0.06);
+      border: 2px solid transparent;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
+      transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+    }
+    .hiw-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 48px rgba(217, 112, 31, 0.18);
+      border-color: var(--color-terracotta);
+    }
+
+    .card-top-row {
+      display: flex;
       align-items: center;
-      text-align: center;
-      padding: 0 1rem 2rem;
-      z-index: 1;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
     }
-
-    /* Watermark big number */
-    .hiw-watermark {
-      position: absolute;
-      top: -1rem;
-      left: 50%;
-      transform: translateX(-50%);
+    .step-num-big {
       font-family: var(--font-display);
-      font-size: 7rem;
+      font-size: 2.8rem;
       font-weight: 900;
-      color: rgba(255,255,255,0.03);
+      background: linear-gradient(135deg, var(--color-terracotta), var(--color-amber-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       line-height: 1;
-      pointer-events: none;
-      user-select: none;
-      letter-spacing: -0.05em;
     }
 
-    /* Icon bubble */
-    .hiw-icon-wrap {
-      position: relative;
-      margin-bottom: 1.75rem;
-    }
-    .hiw-icon-ring {
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.06);
-      border: 1.5px solid rgba(255,255,255,0.12);
-      backdrop-filter: blur(12px);
+    .step-icon-box {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform var(--transition-base), box-shadow var(--transition-base);
-      cursor: default;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
     }
-    .hiw-step:hover .hiw-icon-ring {
-      transform: translateY(-6px) scale(1.05);
-    }
-    .hiw-icon-svg svg {
+    .step-emoji { font-size: 1.8rem; }
+
+    .box-color-1 { background: rgba(217,112,31,0.14); border: 1.5px solid rgba(217,112,31,0.3); }
+    .box-color-2 { background: rgba(232,174,75,0.18); border: 1.5px solid rgba(232,174,75,0.35); }
+    .box-color-3 { background: rgba(15,92,98,0.12); border: 1.5px solid rgba(15,92,98,0.25); }
+    .box-color-4 { background: rgba(223,149,62,0.16); border: 1.5px solid rgba(223,149,62,0.3); }
+
+    .card-content { flex: 1; margin-bottom: 1.5rem; }
+    .step-label-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--color-terracotta);
+      margin-bottom: 0.35rem;
       display: block;
     }
-
-    /* Per-step accent colours */
-    .step-color-1 .hiw-icon-ring {
-      background: rgba(217,112,31,0.15);
-      border-color: rgba(217,112,31,0.4);
-      box-shadow: 0 0 32px rgba(217,112,31,0.2);
-    }
-    .step-color-1:hover .hiw-icon-ring { box-shadow: 0 8px 40px rgba(217,112,31,0.45); }
-    .step-color-2 .hiw-icon-ring {
-      background: rgba(232,174,75,0.15);
-      border-color: rgba(232,174,75,0.4);
-      box-shadow: 0 0 32px rgba(232,174,75,0.2);
-    }
-    .step-color-2:hover .hiw-icon-ring { box-shadow: 0 8px 40px rgba(232,174,75,0.45); }
-    .step-color-3 .hiw-icon-ring {
-      background: rgba(15,92,98,0.3);
-      border-color: rgba(15,92,98,0.6);
-      box-shadow: 0 0 32px rgba(15,92,98,0.3);
-    }
-    .step-color-3:hover .hiw-icon-ring { box-shadow: 0 8px 40px rgba(15,92,98,0.5); }
-    .step-color-4 .hiw-icon-ring {
-      background: rgba(223,149,62,0.15);
-      border-color: rgba(223,149,62,0.4);
-      box-shadow: 0 0 32px rgba(223,149,62,0.2);
-    }
-    .step-color-4:hover .hiw-icon-ring { box-shadow: 0 8px 40px rgba(223,149,62,0.45); }
-
-    /* Number badge */
-    .hiw-badge {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: var(--color-terracotta);
-      color: white;
-      font-size: 0.72rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid #1E413D;
-      box-shadow: 0 2px 8px rgba(217,112,31,0.5);
-    }
-
-    /* Arrow connector */
-    .hiw-arrow {
-      position: absolute;
-      top: 32px;
-      right: -16px;
-      z-index: 2;
-      opacity: 0.7;
-    }
-
-    /* Step text */
-    .hiw-text {
-      padding: 0 0.5rem;
-    }
-    .hiw-step-label {
-      font-size: 0.68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--color-amber-gold);
-      opacity: 0.75;
-      margin-bottom: 0.4rem;
-    }
-    .hiw-step-title {
+    .step-title {
       font-family: var(--font-display);
+      font-size: 1.3rem;
       font-weight: 800;
-      font-size: 1.1rem;
-      color: white;
-      margin-bottom: 0.5rem;
-      line-height: 1.2;
+      color: var(--color-teal-deep);
+      margin-bottom: 0.6rem;
+      line-height: 1.25;
     }
-    .hiw-step-desc {
-      font-size: 0.825rem;
-      color: rgba(228,217,195,0.65);
+    .step-desc {
+      font-size: 0.875rem;
+      color: rgba(30, 65, 61, 0.75);
       line-height: 1.6;
+    }
+
+    .card-chip {
+      background: var(--color-offwhite);
+      padding: 0.5rem 0.85rem;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--color-teal-dark);
+      text-align: center;
+      border: 1px solid rgba(15,92,98,0.08);
     }
 
     /* Bottom CTA */
     .hiw-cta {
       text-align: center;
       margin-top: 3.5rem;
-      padding-top: 2.5rem;
-      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 2rem;
+      border-top: 1px solid rgba(15,92,98,0.1);
     }
     .hiw-cta-note {
-      font-size: 0.82rem;
-      color: rgba(228,217,195,0.45);
+      font-size: 0.85rem;
+      color: rgba(30,65,61,0.6);
       margin-top: 0.75rem;
     }
 
@@ -723,32 +629,40 @@ import { RouterLink } from '@angular/router';
       .gc-1 { width: 340px; height: 340px; }
       .gc-2 { width: 240px; height: 240px; }
       .stories-grid { grid-template-columns: repeat(2, 1fr); }
-      .hiw-timeline { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
-      .hiw-line { display: none; }
-      .hiw-arrow { display: none; }
+      .hiw-cards-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
     }
     @media (max-width: 860px) {
       .hero { grid-template-columns: 1fr; grid-template-rows: auto; }
       .hero-clip { display: none; }
-      .hero-left { padding: 7rem 2.5rem 3rem; align-items: flex-start; }
+      .hero-left { padding: 5.5rem 2rem 3rem; align-items: flex-start; }
       .hero-left-content { max-width: 100%; }
-      .hero-right { min-height: 380px; }
-      .logo-frame { width: 160px; height: 160px; }
+      .hero-right { min-height: 320px; padding: 2.5rem 1rem; }
+      .logo-frame { width: 170px; height: 170px; }
       .gc-1 { width: 280px; height: 280px; }
       .gc-2 { width: 200px; height: 200px; }
-      .f1, .f2, .f3, .f4, .f5 { font-size: 1.6rem; }
+      .f1, .f2, .f3, .f4, .f5 { font-size: 1.6rem; opacity: 0.65; }
     }
     @media (max-width: 640px) {
       .stories-grid { grid-template-columns: 1fr; }
       .story-inner { grid-template-columns: 1fr; text-align: center; }
       .brand-logo-img { display: block; margin: 0 auto; }
-      .hiw-timeline { grid-template-columns: 1fr; }
-      .hero-stats { gap: 1rem; }
+      .hiw-cards-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+      .hero-stats { gap: 0.75rem; justify-content: space-between; width: 100%; }
+      .stat-val { font-size: 1.25rem; }
+      .stat-label { font-size: 0.65rem; }
     }
     @media (max-width: 480px) {
-      .hero-left { padding: 6rem 1.5rem 2.5rem; }
-      .hero-title { font-size: 3rem; }
-      .hero-actions { flex-direction: column; align-items: flex-start; }
+      .hero-left { padding: 4.75rem 1.25rem 2.25rem; }
+      .hero-title { font-size: clamp(2.3rem, 9vw, 3.2rem); margin-bottom: 1.25rem; }
+      .hero-sub { font-size: 0.95rem; margin-bottom: 1.75rem; }
+      .hero-actions { flex-direction: column; width: 100%; gap: 0.75rem; }
+      .hero-actions .btn { width: 100%; justify-content: center; text-align: center; }
+      .hero-stats { grid-template-columns: repeat(3, 1fr); display: grid; text-align: center; }
+      .stat-divider { display: none; }
+      .logo-frame { width: 140px; height: 140px; }
+      .logo-tagline { font-size: 1rem; }
+      .logo-hindi { font-size: 0.8rem; }
+      .hiw-watermark { font-size: 5rem; right: -5px; }
     }
   `]
 })

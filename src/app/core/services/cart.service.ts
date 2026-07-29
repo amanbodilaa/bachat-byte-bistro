@@ -9,6 +9,15 @@ export class CartService {
   private cartSubject = new BehaviorSubject<CartItem[]>([]);
   cart$: Observable<CartItem[]> = this.cartSubject.asObservable();
 
+  private isDrawerOpenSubject = new BehaviorSubject<boolean>(false);
+  isDrawerOpen$: Observable<boolean> = this.isDrawerOpenSubject.asObservable();
+
+  private toastSubject = new BehaviorSubject<{ message: string; emoji: string } | null>(null);
+  toast$: Observable<{ message: string; emoji: string } | null> = this.toastSubject.asObservable();
+
+  private orderNoteSubject = new BehaviorSubject<string>('');
+  orderNote$: Observable<string> = this.orderNoteSubject.asObservable();
+
   cartCount$: Observable<number> = this.cart$.pipe(
     map(items => items.reduce((sum, i) => sum + i.quantity, 0))
   );
@@ -19,6 +28,26 @@ export class CartService {
 
   getCart(): CartItem[] {
     return this.cartSubject.value;
+  }
+
+  openCart(): void {
+    this.isDrawerOpenSubject.next(true);
+  }
+
+  closeCart(): void {
+    this.isDrawerOpenSubject.next(false);
+  }
+
+  toggleCart(): void {
+    this.isDrawerOpenSubject.next(!this.isDrawerOpenSubject.value);
+  }
+
+  setOrderNote(note: string): void {
+    this.orderNoteSubject.next(note);
+  }
+
+  getOrderNote(): string {
+    return this.orderNoteSubject.value;
   }
 
   addItem(menuItem: MenuItem): void {
@@ -33,6 +62,8 @@ export class CartService {
     } else {
       this.cartSubject.next([...current, { menuItem, quantity: 1 }]);
     }
+
+    this.showToast(`Added ${menuItem.name} to basket`, menuItem.emoji || '🍽️');
   }
 
   removeItem(menuItemId: string): void {
@@ -65,5 +96,14 @@ export class CartService {
       (sum, i) => sum + i.menuItem.price * i.quantity,
       0
     );
+  }
+
+  private showToast(message: string, emoji: string): void {
+    this.toastSubject.next({ message, emoji });
+    setTimeout(() => {
+      if (this.toastSubject.value?.message === message) {
+        this.toastSubject.next(null);
+      }
+    }, 2500);
   }
 }

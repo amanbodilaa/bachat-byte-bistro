@@ -235,8 +235,17 @@ import { Order } from '../../core/models/order.model';
     .p-mode { font-size: 0.8rem; opacity: 0.6; }
 
     @media (max-width: 640px) {
-      .search-row { flex-direction: column; }
+      .counter-page { padding: 1.25rem 1rem 4rem; }
+      .counter-header { gap: 0.85rem; }
+      .counter-logo { width: 48px; height: 48px; }
+      .counter-header h1 { font-size: 1.4rem; }
+      .search-bar { padding: 1.25rem 1rem !important; }
+      .search-row { flex-direction: column; align-items: stretch; gap: 1rem; }
+      .search-group { width: 100%; min-width: 0; }
       .search-or { display: none; }
+      .search-row .btn { width: 100%; justify-content: center; margin-top: 0.5rem; }
+      .pending-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+      .pending-row .btn { width: 100%; }
     }
   `]
 })

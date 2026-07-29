@@ -1,12 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { AsyncPipe } from '@angular/common';
-import { CartService } from '../../core/services/cart.service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, AsyncPipe],
+  imports: [RouterLink, RouterLinkActive],
   template: `
     <nav class="navbar" [class.scrolled]="scrolled">
       <div class="nav-inner">
@@ -19,27 +17,18 @@ import { CartService } from '../../core/services/cart.service';
           </div>
         </a>
 
-        <!-- Desktop Nav Links -->
+        <!-- Desktop & Mobile Nav Links -->
         <ul class="nav-links" [class.open]="menuOpen">
           <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="menuOpen=false">Home</a></li>
           <li><a routerLink="/menu" routerLinkActive="active" (click)="menuOpen=false">Menu</a></li>
+          <li><a href="/#stories" (click)="menuOpen=false">About Us</a></li>
           <li><a routerLink="/track/demo" routerLinkActive="active" (click)="menuOpen=false">Track Order</a></li>
-          <li class="staff-links">
-            <span class="staff-label">Staff</span>
-            <a routerLink="/counter" routerLinkActive="active" (click)="menuOpen=false">Counter</a>
-            <a routerLink="/kitchen" routerLinkActive="active" (click)="menuOpen=false">Kitchen</a>
-          </li>
+          <li><a routerLink="/checkout" routerLinkActive="active" (click)="menuOpen=false">Checkout</a></li>
         </ul>
 
-        <!-- Cart & Hamburger -->
+        <!-- Mobile Hamburger Toggle -->
         <div class="nav-actions">
-          <a routerLink="/menu" class="cart-btn" aria-label="Open cart">
-            <span class="cart-icon">🛒</span>
-            @if ((cartCount$ | async)! > 0) {
-              <span class="cart-badge">{{ cartCount$ | async }}</span>
-            }
-          </a>
-          <button class="hamburger" (click)="menuOpen = !menuOpen" [attr.aria-expanded]="menuOpen" aria-label="Toggle menu">
+          <button class="hamburger" [class.active]="menuOpen" (click)="menuOpen = !menuOpen" [attr.aria-expanded]="menuOpen" aria-label="Toggle menu">
             <span></span><span></span><span></span>
           </button>
         </div>
@@ -54,45 +43,49 @@ import { CartService } from '../../core/services/cart.service';
       right: 0;
       z-index: 900;
       height: var(--navbar-height);
-      background: rgba(251, 248, 231, 0.92);
-      backdrop-filter: blur(16px);
-      border-bottom: 2px solid rgba(217, 112, 31, 0.18);
+      background: rgba(251, 248, 231, 0.94);
+      backdrop-filter: blur(20px);
+      border-bottom: 2px solid rgba(217, 112, 31, 0.22);
       transition: background var(--transition-base), box-shadow var(--transition-base);
     }
     .navbar.scrolled {
       background: rgba(251, 248, 231, 0.98);
-      box-shadow: 0 4px 24px rgba(15, 92, 98, 0.12);
+      box-shadow: 0 6px 30px rgba(15, 92, 98, 0.14);
     }
     .nav-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
       height: 100%;
-      max-width: 1200px;
+      max-width: 1240px;
       margin: 0 auto;
       padding: 0 2rem;
-      gap: 1.25rem;
+      gap: 1.5rem;
     }
     .nav-logo {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 1.1rem;
       text-decoration: none;
       flex-shrink: 0;
     }
     .logo-img {
-      width: 64px;
-      height: 64px;
+      width: 76px;
+      height: 76px;
       border-radius: 50%;
       object-fit: cover;
-      border: 3px solid var(--color-terracotta);
-      box-shadow: 0 0 0 5px rgba(217, 112, 31, 0.15), 0 4px 16px rgba(217, 112, 31, 0.25);
+      border: 3.5px solid var(--color-terracotta);
+      box-shadow:
+        0 0 0 6px rgba(217, 112, 31, 0.16),
+        0 8px 24px rgba(217, 112, 31, 0.35);
       flex-shrink: 0;
       transition: transform var(--transition-base), box-shadow var(--transition-base);
     }
     .nav-logo:hover .logo-img {
-      transform: scale(1.06) rotate(3deg);
-      box-shadow: 0 0 0 7px rgba(217, 112, 31, 0.20), 0 6px 24px rgba(217, 112, 31, 0.40);
+      transform: scale(1.08) rotate(3deg);
+      box-shadow:
+        0 0 0 8px rgba(217, 112, 31, 0.22),
+        0 12px 32px rgba(217, 112, 31, 0.50);
     }
     .logo-text {
       display: flex;
@@ -102,90 +95,53 @@ import { CartService } from '../../core/services/cart.service';
     .logo-name {
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: 1.2rem;
+      font-size: 1.35rem;
       color: var(--color-teal-deep);
       letter-spacing: -0.02em;
       white-space: nowrap;
     }
     .logo-hindi {
-      font-size: 0.82rem;
+      font-size: 0.88rem;
       color: var(--color-terracotta);
       font-weight: 700;
-      letter-spacing: 0.01em;
+      letter-spacing: 0.02em;
     }
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 0.25rem;
+      gap: 0.5rem;
       list-style: none;
       flex: 1;
       justify-content: center;
     }
-    .nav-links li { display: flex; align-items: center; gap: 0.25rem; }
+    .nav-links li { display: flex; align-items: center; }
     .nav-links a {
-      padding: 0.45rem 0.85rem;
+      padding: 0.55rem 1.1rem;
       border-radius: var(--radius-full);
-      font-weight: 500;
-      font-size: 0.9rem;
+      font-weight: 600;
+      font-size: 0.95rem;
       color: var(--color-teal-dark);
-      transition: background var(--transition-fast), color var(--transition-fast);
+      transition: all var(--transition-fast);
+      border: 1.5px solid transparent;
     }
     .nav-links a:hover {
       background: rgba(15, 92, 98, 0.08);
       color: var(--color-teal-deep);
+      border-color: rgba(15, 92, 98, 0.15);
+      transform: translateY(-1px);
     }
     .nav-links a.active {
-      background: var(--color-teal-deep);
+      background: linear-gradient(135deg, var(--color-teal-deep), #164a4e);
       color: white;
+      box-shadow: 0 6px 20px rgba(15, 92, 98, 0.28);
+      border-color: transparent;
     }
-    .staff-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--color-amber-gold);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding-left: 0.5rem;
-      border-left: 2px solid var(--color-amber-gold);
-    }
-    .staff-links { gap: 0.25rem !important; }
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.85rem;
     }
-    .cart-btn {
-      position: relative;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: var(--color-terracotta);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-      box-shadow: 0 2px 12px rgba(217, 112, 31, 0.35);
-    }
-    .cart-btn:hover { transform: scale(1.08); box-shadow: 0 4px 20px rgba(217, 112, 31, 0.55); }
-    .cart-icon { font-size: 1.1rem; }
-    .cart-badge {
-      position: absolute;
-      top: -4px;
-      right: -4px;
-      background: var(--color-amber-gold);
-      color: var(--color-teal-dark);
-      font-size: 0.65rem;
-      font-weight: 800;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid var(--color-offwhite);
-      animation: pulse-ring 1.5s infinite;
-    }
+
     .hamburger {
       display: none;
       flex-direction: column;
@@ -197,18 +153,22 @@ import { CartService } from '../../core/services/cart.service';
     }
     .hamburger span {
       display: block;
-      width: 22px;
-      height: 2px;
+      width: 24px;
+      height: 2.5px;
       background: var(--color-teal-deep);
       border-radius: 2px;
       transition: all var(--transition-base);
     }
-    @media (max-width: 700px) {
-      .logo-text { display: none; }
-      .logo-img { width: 54px; height: 54px; }
-    }
+
     @media (max-width: 768px) {
-      .hamburger { display: flex; }
+      .nav-inner { padding: 0 1rem; }
+      .logo-img { width: 58px; height: 58px; }
+      .logo-name { font-size: 1.05rem; }
+      .logo-hindi { font-size: 0.78rem; }
+      .hamburger { display: flex; z-index: 950; }
+      .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+      .hamburger.active span:nth-child(2) { opacity: 0; }
+      .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
       .nav-links {
         position: fixed;
         top: var(--navbar-height);
@@ -217,30 +177,32 @@ import { CartService } from '../../core/services/cart.service';
         background: var(--color-offwhite);
         flex-direction: column;
         align-items: stretch;
-        padding: 1rem 1.5rem 2rem;
-        gap: 0.25rem;
-        box-shadow: var(--shadow-lg);
+        padding: 1.25rem 1.5rem 2rem;
+        gap: 0.5rem;
+        box-shadow: 0 10px 30px rgba(15, 92, 98, 0.15);
         transform: translateY(-110%);
         opacity: 0;
         transition: transform var(--transition-base), opacity var(--transition-base);
         pointer-events: none;
+        border-bottom: 2px solid var(--color-terracotta);
       }
       .nav-links.open {
         transform: translateY(0);
         opacity: 1;
         pointer-events: auto;
       }
-      .nav-links a { padding: 0.75rem 1rem; font-size: 1rem; }
-      .staff-label { padding-left: 0; border-left: none; margin-top: 0.5rem; }
-      .staff-links { flex-direction: column; align-items: stretch; }
+      .nav-links a { padding: 0.85rem 1.25rem; font-size: 1.05rem; font-weight: 600; }
+    }
+    @media (max-width: 400px) {
+      .logo-name { font-size: 0.9rem; }
+      .logo-hindi { font-size: 0.7rem; }
+      .nav-inner { gap: 0.5rem; }
     }
   `]
 })
 export class NavbarComponent {
   menuOpen = false;
   scrolled = false;
-  private cartService = inject(CartService);
-  cartCount$ = this.cartService.cartCount$;
 
   constructor() {
     if (typeof window !== 'undefined') {

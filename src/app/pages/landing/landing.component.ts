@@ -168,7 +168,38 @@ import { RouterLink } from '@angular/router';
               <!-- Icon bubble -->
               <div class="hiw-icon-wrap" [class]="'step-color-' + step.no">
                 <div class="hiw-icon-ring">
-                  <span class="hiw-icon-svg" [innerHTML]="step.svg"></span>
+                  <span class="hiw-icon-svg">
+                    @if (step.no === 1) {
+                      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="4" width="24" height="36" rx="4" stroke="#D9701F" stroke-width="2"/>
+                        <rect x="14" y="8" width="16" height="10" rx="2" fill="rgba(217,112,31,0.2)" stroke="#D9701F" stroke-width="1.5"/>
+                        <circle cx="22" cy="32" r="3" fill="#D9701F"/>
+                        <line x1="14" y1="22" x2="30" y2="22" stroke="#E8AE4B" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="14" y1="26" x2="26" y2="26" stroke="#E8AE4B" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    } @else if (step.no === 2) {
+                      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="6" y="12" width="32" height="22" rx="4" stroke="#E8AE4B" stroke-width="2"/>
+                        <rect x="6" y="17" width="32" height="5" fill="rgba(232,174,75,0.25)" stroke="none"/>
+                        <circle cx="14" cy="28" r="3" fill="rgba(232,174,75,0.4)" stroke="#E8AE4B" stroke-width="1.5"/>
+                        <rect x="22" y="26" width="10" height="4" rx="2" fill="rgba(232,174,75,0.4)" stroke="#E8AE4B" stroke-width="1.5"/>
+                        <text x="22" y="10" text-anchor="middle" font-size="10" font-weight="700" fill="#E8AE4B" font-family="sans-serif">₹</text>
+                      </svg>
+                    } @else if (step.no === 3) {
+                      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="8" y="8" width="28" height="20" rx="3" stroke="#E8AE4B" stroke-width="2" fill="rgba(232,174,75,0.15)"/>
+                        <text x="22" y="22" text-anchor="middle" font-size="11" font-weight="900" fill="#E8AE4B" font-family="sans-serif">#07</text>
+                        <path d="M14 32 Q22 38 30 32" stroke="#E8AE4B" stroke-width="2" stroke-linecap="round" fill="none"/>
+                        <circle cx="22" cy="38" r="3" fill="#E8AE4B"/>
+                      </svg>
+                    } @else if (step.no === 4) {
+                      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 30 Q10 36 22 38 Q34 36 34 30" stroke="#DF953E" stroke-width="2" fill="rgba(223,149,62,0.15)" stroke-linejoin="round"/>
+                        <path d="M10 30 L10 20 Q10 16 22 14 Q34 16 34 20 L34 30" stroke="#DF953E" stroke-width="2" fill="rgba(223,149,62,0.15)"/>
+                        <polyline points="16,24 20,28 28,20" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    }
+                  </span>
                 </div>
                 <!-- Step number badge -->
                 <div class="hiw-badge">{{ step.no }}</div>
